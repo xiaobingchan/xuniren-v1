@@ -60,11 +60,11 @@ def clearstatus():
     last_request_time = 0
     wenxin_length=0
     answer_sentence="" # 判断文本相似度
-    data = request.json
+    data = request.form
     # 接收 JSON 数据
     # F:/audio2face-2023.1.1/exts/omni.audio2face.player_deps/deps/audio2face-data/tracks/
     # {"message":"你好吗"}
-    data_message = data["message"]
+    data_message = data.get("message")
     # 根据中文TTS生成wav文件
     output = data_message
     wav_file = wav_name
@@ -94,7 +94,8 @@ def clearstatus():
     }
     response = requests.post(url, headers=headers, json=dat2a)
     # 返回收到的数据，这只是为了演示
-    data["message"]=data_message
+    data={}
+    data["message"]=str(data_message)
     data["record_time"]=total_length
     return jsonify(data)
 
@@ -103,11 +104,12 @@ def clearstatus():
 # 打断逻辑
 @app.route('/daduan', methods=['POST'])
 def daduan():
-    data = request.json
+    data = request.form
     global record_time
     global startrecord
+    global last_request_time
     # 接收 JSON 数据
-    data_message = data["message"]
+    data_message = data.get("message")
     # 判断是否在说话
     start_time = startrecord
     if start_time is None:
@@ -161,6 +163,8 @@ def daduan():
         # 返回收到的数据，这只是为了演示
         response = {'message': 'ok'}
         wenxin_length=0
+        current_time = time.time()
+        last_request_time = current_time
     else:
         print("没有在说话，不执行打断")
         # 返回收到的数据，这只是为了演示
@@ -173,11 +177,11 @@ def speak():
     global record_time
     global startrecord
     startrecord = time.time()  # 记录开始时间
-    data = request.json
+    data = request.form
     # 接收 JSON 数据
     # F:/audio2face-2023.1.1/exts/omni.audio2face.player_deps/deps/audio2face-data/tracks/
     # {"message":"你好吗"}
-    data_message = data["message"]
+    data_message = data.get("message")
     #print(data_message)
 
     # 根据中文TTS生成wav文件
@@ -212,35 +216,36 @@ def speak():
     response = requests.post(url, headers=headers, json=dat2a)
     record_time=total_length
     # 返回收到的数据，这只是为了演示
+    data = {}
     data["message"]=data_message
     data["record_time"]=total_length
     return jsonify(data)
 
 # 文心一言调用时间限制
-def timer_limit(func):
-    def wrapper(*args, **kwargs):
-        global last_request_time
-        global wenxin_length
-        current_time = time.time()
-        elapsed_time = current_time - last_request_time
-        if elapsed_time > wenxin_length+3:
-            last_request_time = current_time
-            return func(*args, **kwargs)
-        else:
-            return jsonify({'error': '请求太频繁，请等待10秒后再试'}), 400
-    return wrapper
+# def timer_limit(func):
+#     def wrapper(*args, **kwargs):
+#         global last_request_time
+#         global wenxin_length
+#         current_time = time.time()
+#         elapsed_time = current_time - last_request_time
+#         if elapsed_time > wenxin_length+1:
+#             last_request_time = current_time
+#             return func(*args, **kwargs)
+#         else:
+#             return jsonify({'error': '请求太频繁，请等待10秒后再试'}), 400
+#     return wrapper
 
 # 文心一言回答
 @app.route('/wenxin', methods=['POST'])
-@timer_limit
+# @timer_limit
 def wenxin():
     global wenxin_length
     global record_time
     global startrecord
     global answer_sentence
     startrecord = time.time()  # 记录开始时间
-    data = request.json
-    data_message = data["message"]
+    data = request.form
+    data_message = data.get("message")
     # 判断文本相似度
     similarity_ratio = SequenceMatcher(None, answer_sentence, data_message).ratio()
     print("文本相似度")
@@ -271,6 +276,7 @@ def wenxin():
             }
             res = requests.request("POST", url, headers=headers, data=payload).json()
             # 根据中文TTS生成wav文件
+            print(res)
             output = res['result']
         answer_sentence=output
         wav_file = wav_name
@@ -303,6 +309,7 @@ def wenxin():
         }
         response = requests.post(url, headers=headers, json=dat2a)
         record_time=total_length
+        data = {}
         data["message"]=output
         return jsonify(data)
 
