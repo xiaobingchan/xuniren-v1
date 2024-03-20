@@ -284,30 +284,30 @@ def wenxin():
 
         # 计算音频总长度，秒
         total_length = get_duration(wav_file)
-        # wenxin_length=total_length
-        # audio = AudioSegment.from_file(wav_file)
-        # length = len(audio) / 1000 # 获取的长度单位是毫秒，转换为秒钟
+        wenxin_length=total_length
+        audio = AudioSegment.from_file(wav_file)
+        length = len(audio) / 1000 # 获取的长度单位是毫秒，转换为秒钟
         
-        # url = a2fserverurl+'/A2F/Player/SetTrack'
-        # headers = {
-        #     'accept': 'application/json',
-        #     'Content-Type': 'application/json'
-        # }
-        # dat2a = {
-        #     'a2f_player': '/World/audio2face/Player',
-        #     'file_name': wav_name,
-        #     'time_range': [0, -1]
-        # }
-        # response = requests.post(url, headers=headers, json=dat2a)
-        # url = a2fserverurl+'/A2F/Player/Play'
-        # headers = {
-        #     'accept': 'application/json',
-        #     'Content-Type': 'application/json'
-        # }
-        # dat2a = {
-        #     'a2f_player': '/World/audio2face/Player'
-        # }
-        # response = requests.post(url, headers=headers, json=dat2a)
+        url = a2fserverurl+'/A2F/Player/SetTrack'
+        headers = {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+        dat2a = {
+            'a2f_player': '/World/audio2face/Player',
+            'file_name': wav_name,
+            'time_range': [0, -1]
+        }
+        response = requests.post(url, headers=headers, json=dat2a)
+        url = a2fserverurl+'/A2F/Player/Play'
+        headers = {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+        dat2a = {
+            'a2f_player': '/World/audio2face/Player'
+        }
+        response = requests.post(url, headers=headers, json=dat2a)
         record_time=total_length
         data = {}
         data["message"]=output
@@ -339,5 +339,4 @@ if __name__ == '__main__':
     response = requests.post(url, headers=headers, json=data)
     print("初始化完成")
     app.run(port=5000, debug=True)
-
 
