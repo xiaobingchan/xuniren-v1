@@ -1,0 +1,10 @@
+asr/*.bin
+asr/*.param
+__pycache__/
+hub/models--moka-ai--m3e-base
+hun/.locks/
+wavs/*.wav
+camera/*.mp4
+camera/*.pt
+*.wav
+*.exe

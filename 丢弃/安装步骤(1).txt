@@ -1,0 +1,113 @@
+1，安装阿里云语音合成SDK：https://help.aliyun.com/document_detail/450507.html?spm=a2c4g.450514.0.i0#0196f89028lk2
+
+获取阿里云token：https://nls-portal.console.aliyun.com/applist
+
+git clone https://github.com/aliyun/alibabacloud-nls-python-sdk/
+cd alibabacloud-nls-python-sdk/
+
+python -m pip install -r requirements.txt
+
+
+2 ，修改变量变成你们自己的
+
+2.1 修改 alitts.py 的 
+
+# 创建AcsClient实例
+# 创建AcsClient实例
+client = AcsClient(
+   "xxx",
+   "xxxxxx",
+   "cn-shanghai"
+);
+.....................
+
+appKey = 'pAC8NSFL2DjQSWQr'
+
+
+3，运行Python程序，看看是否生成音频
+
+记住，alitts.py要放在python测试程序的同一个目录下
+
+
+
+
+1，audio2face安装位置：F:\audio2face\audio2face-2023.1.1\exts\omni.audio2face.exporter\omni\audio2face\exporter\scripts
+   配置文件位置：F:\audio2face\audio2face-2023.1.1\exts\omni.audio2face.exporter\config
+2，UE5项目位置：E:\women001_tes\women001_tes
+3，Python程序的位置：C:\Users\ASUS\Desktop\伟大项目\xuniren-v1
+4，后台a2f程序：F:\audio2face\AudioToLipsyncServer\AudioToLipsyncServer
+
+
+教程步骤：
+
+第一步，配置嘴型服务器
+
+第二步，修改a2f源码
+
+第三步，启动嘴型服务器
+
+第四步，启动python服务
+
+第五步，启动ue5项目
+
+第六步，apipost测试
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+百度AIStudio access_token: 88fb8e8ee3c5819956c80f5f2811806d6146f0ee
+
+
+1.0 安装python依赖包：
+     pip install flask
+
+1.1 下载安装包 https://static-aliyun-doc.oss-cn-hangzhou.aliyuncs.com/file-manage-files/zh-CN/20221222/efsj/alibabacloud-nls-python-sdk-1.0.0.zip
+1.2 解压安装包：
+                         c:
+                         cd C:\Users\ASUS\Desktop\alibabacloud-nls-python-sdk-1.0.0\
+                         pip install setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
+                         pip install -r requirements.txt
+                         pip install .
+
+
+2. 安装文心一言SDK：https://yiyan.baidu.com/developer/doc#sllzziq8k
+
+git clone https://github.com/PaddlePaddle/ERNIE-Bot-SDK
+cd ERNIE-Bot-SDK
+pip install .
+
+
+
+3.2 修改 wenxin_yiyan 的
+
+erniebot.access_token = '8943978c235cd7c776e83e232111051259d663a6'
+
+4，把audio2face全屏放在第一个屏幕
+
+5，把ue数字人全屏放在第二个屏幕，运行：F:\BaiduNetdiskDownload\AI数字人实时教学课程\UE5项目文件\women001_tes
+
+6，运行audio2face的播放键，看看数字人嘴型有没有变化：，如果有，就进入第七步
+
+7，运行python程序，在第二个屏幕
+
+python wenxin_yiyan.py
+
+

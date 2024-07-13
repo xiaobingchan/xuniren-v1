@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<!--窗口设置,宽度自适应为设备屏幕宽度,初始比例为1.0-->
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+	<button
+		style="margin-left: 80px;  width: 150px; height: 75px; border-radius: 25px; padding-left: 12px; padding-right: 12px; padding-top: 20px; padding-bottom: 20px; font-size: 30px;"
+		class="btn btn-default" id="myButton" onclick="hideButton()">开始运行</button>
+	<video id="video" autoplay="true" style=" solid 2px; height: 800px; width: 800px;" playsinline="true"></video>
+	<img id="my-image" style="display: none;" src="" alt="My Image">
+</head>
+
+<body>
+	<!--添加按钮,用于手动调用js获取数据-->
+	<button type="submit" id="btn_submit" style="display: none;"> 手动从UE4获取数据 </button>
+	<!--导入jquery和echarts-->
+	<script type="text/javascript" src="sockjs-0.3.4.js"></script>
+	<script type="text/javascript" src="jquery-2.1.1.min.js"></script>
+	<script src="echarts.min.js"></script>
+	<script>
+
+		function hideButton() {
+			var button = document.getElementById('myButton');
+			button.style.display = 'none';
+		}
+
+		var host = window.location.hostname
+		var ws = new WebSocket("ws://127.0.0.1:8802/dighuman");
+		//document.getElementsByTagName("video")[0].setAttribute("src", aa["video"]);
+		ws.onopen = function () {
+			console.log('Connected');
+		};
+		ws.onmessage = function (e) {
+			console.log('Received: ' + e.data);
+			data = e
+			var vid = JSON.parse(data.data);
+			console.log(typeof (vid), vid)
+			document.getElementsByTagName("video")[0].setAttribute("src", vid["video"]);
+
+		};
+		ws.onclose = function (e) {
+			console.log('Closed');
+		};
+
+
+		let interrupted = false;
+		/**
+		 * 更新数据函数
+		 * arg:在本例中,参数类型为字符串,格式为:'value1,value2,value3,....valueX',即数值以逗号隔开
+		 */
+		function UpdateDataFromUe4(arg) {
+			interrupted = false
+
+			var message = arg;
+			if (message === "stop") {
+				// 接收到停止指令
+				console.log("停止！！！");
+				document.getElementsByTagName("img")[0].style.display = 'none';
+				document.getElementsByTagName("video")[0].style.display = 'none';
+				document.getElementsByTagName("video")[0].muted = true;
+				interrupted = true;
+				return;
+			}
+
+			const parts = message.split(";"); // 按分号拆分字符串
+
+			let currentIndex = 0; // 当前解析到的索引
+
+			function printNext() {
+				if (currentIndex >= parts.length) {
+					// 达到数组末尾或被中断，则停止打印
+					console.log("打印结束");
+					return;
+				}
+
+				const [delay, filename] = parts[currentIndex].split(","); // 按逗号拆分每个部分
+				const parsedData = {
+					delay: parseInt(delay),
+					filename: filename.trim() // 去除文件名前后的空格
+				};
+
+				setTimeout(() => {
+					console.log(parsedData.filename);
+					if (parsedData.filename.includes(".mp4") && !interrupted) {
+						document.getElementsByTagName("video")[0].muted = false;
+						document.getElementsByTagName("video")[0].style.display = 'block';
+						document.getElementsByTagName("img")[0].style.display = 'none';
+						ws.send(parsedData.filename);
+					} else if (parsedData.filename.includes(".jpg") && !interrupted) {
+						document.getElementsByTagName("img")[0].style.display = 'block';
+						document.getElementsByTagName("video")[0].style.display = 'none';
+						document.getElementsByTagName("video")[0].muted = true;
+						image = document.getElementById('my-image');
+						image.setAttribute("src", parsedData.filename);
+					}
+					else {
+						document.getElementsByTagName("img")[0].style.display = 'none';
+						document.getElementsByTagName("video")[0].style.display = 'none';
+						document.getElementsByTagName("video")[0].muted = true;
+					}
+					currentIndex++;
+					printNext(); // 继续打印下一个文件名
+				}, parsedData.delay * 1000); // 将延时秒数转换为毫秒
+
+			}
+			// 开始打印
+			printNext();
+
+		}
+		//绑定按钮点击事件
+		document.getElementById("btn_submit").addEventListener('click', JsGetDataFromUE4, false);
+		//js调用ue4函数
+		function JsGetDataFromUE4() {
+			alert("调用JSGetDataFromUE4");
+			/**
+			 * ue4obj是在UE4中绑定对象时传入的名字,要一致
+			 * jsgetdatafromue是蓝图定义的函数,必须使用小写
+			 * then(function(ReturnValue))中的ReturnValue作为匿名函数的参数列表,不可以改名,必须叫ReturnValue
+			 */
+			ue.ue4obj.jsgetdatafromue().then(function (ReturnValue) {
+				alert("从UE4获取数据:" + ReturnValue);
+				/**
+				 *js从ue4拿到数据
+				 * 因为已经有了现成的更新数据的函数(UpdateDataFromUe4)
+				 * 所以将返回值直接传给该函数,更新数据
+				 */
+				UpdateDataFromUe4(ReturnValue);
+			});
+		}
+	</script>
+</body>
+
+</html>

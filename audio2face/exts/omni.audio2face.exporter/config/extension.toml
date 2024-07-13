@@ -1,0 +1,56 @@
+[package]
+version = "105.19.2"
+title = "Audio2Face Exporter"
+authors = ["NVIDIA"]
+description="Custom Kit exporter for audio2face"
+repository = ""
+keywords = ["audio2face"]
+category = "Animation"
+readme = "docs/README.md"
+changelog = "docs/CHANGELOG.md"
+preview_image = "data/preview.png"
+icon = "data/icon.png"
+
+
+[dependencies]
+"omni.ui" = {optional = true}
+"omni.kit.window.file_exporter" = {optional = true}
+"omni.kit.window.popup_dialog" = {optional = true}
+"omni.graph" = {}
+"omni.graph.tools" = {}
+"omni.client" = {}
+"omni.anim.shared.core" = {}
+"omni.anim.shared.ui" = {optional = true}
+"omni.deform.shared" = {}
+"omni.audio2face.common" = {}
+"omni.audio2face.ui.common" = {optional = true}
+"omni.audio2face.tool" = {}
+"omni.audio2face.player" = {}
+"omni.audio2face.player_deps" = {}
+"omni.avatar.livelink" = {version = "105.7.0"}
+"omni.services.core"={}
+
+[[python.module]]
+name = "omni.audio2face.exporter"
+
+[[test]]
+dependencies = [
+    "omni.ui",
+    "omni.audio2face.core",
+    "omni.audio2face.player",
+    "omni.audio2face.ui.common",
+]
+timeout = 900
+stdoutFailPatterns.exclude = [
+    "*failed to upload minidump*",  # Exclude grahics leaks until fixed
+    "*Assertion raised in compute - No prim connected*", # Happens when node first created
+]
+
+[package.writeTarget]
+kit = true
+platform = true
+
+
+[python.pipapi]
+requirements=['python-osc']
+use_online_index=true

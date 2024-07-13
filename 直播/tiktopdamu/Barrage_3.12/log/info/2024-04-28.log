@@ -1,0 +1,4 @@
+{"clientId":"kW/UBbAB9eTALCl7LcVvx29IfFzhCncqmN0Fk7CRs0M4qzCRHtQ1rlesc4UYitHy","counts":1,"host":"169.254.42.109","level":"info","msg":"客户端已连接","port":"9494","time":"2024-04-28 21:23:44"}
+{"clientId":"kW/UBbAB9eTALCl7LcVvx29IfFzhCncqmN0Fk7CRs0M4qzCRHtQ1rlesc4UYitHy","counts":0,"host":"169.254.42.109","level":"info","msg":"客户端已断开","port":"9494","roomId":"xxx","seconds":25,"time":"2024-04-28 21:24:09"}
+{"clientId":"XZMIkOSOPn8rRKv6K/VglO7aQy3vzHinI+iFZB+uPcjAFVw/ZdhU0dzaNWbkKwNv","counts":1,"host":"169.254.42.109","level":"info","msg":"客户端已连接","port":"9494","time":"2024-04-28 21:24:16"}
+{"clientId":"NwtzXOqBIG/vkFfGappHrh0lSDPNIMdrUqT6zjqL7lZ15V/dBNJgovvVJnEQquPY","counts":1,"host":"169.254.42.109","level":"info","msg":"客户端已连接","port":"9494","time":"2024-04-28 21:52:21"}

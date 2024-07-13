@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto Play Video</title>
+  <style>
+    #video-container {
+      display: none;
+    }
+    #video-container video::-webkit-media-controls {
+      display: none !important;
+    }
+    #image-container {
+      display: none;
+    }
+    #image-container img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="video-container">
+    <video id="my-video" width="640" height="360" autoplay muted>
+    </video>
+  </div>
+
+  <div id="image-container">
+    <img id="my-image" src="zidane.jpg" alt="My Image">
+  </div>
+
+  <script>
+    const videoContainer = document.getElementById('video-container');
+    const video = document.getElementById('my-video');
+    const imageContainer = document.getElementById('image-container');
+    const image = document.getElementById('my-image');
+
+    // 访问：http://127.0.0.1/video_img_show.html?videoname=22.mp4&imgname=zibgaj.jpg
+
+    // 获取当前 URL 的查询参数字符串
+    const queryString = window.location.search;
+
+    // 使用 URLSearchParams 解析查询参数
+    const urlParams = new URLSearchParams(queryString);
+
+    // 获取指定参数的值
+    const videoname = urlParams.get('videoname');
+    const imgname = urlParams.get('imgname');
+
+    var source = document.createElement('source');
+    source.src = videoname;
+    // 清除现有的 source 元素
+    video.innerHTML = '';
+    // 将新的 source 元素添加到 video 元素中
+    video.appendChild(source);
+    // 加载新视频
+    video.load();
+
+
+    console.log(videoname);
+    console.log(imgname);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === '1') {
+        videoContainer.style.display = 'block';
+        video.play();
+        video.onended = () => {
+          videoContainer.style.display = 'none';
+        };
+      } else if (event.key === '2') {
+        videoContainer.style.display = 'none';
+        video.currentTime = 0;
+        video.pause();
+      }
+      else if (event.key === '3') {
+        imageContainer.style.display = 'block';
+      } else if (event.key === '4') {
+        imageContainer.style.display = 'none';
+      }
+    });
+
+// 隐藏图片
+const keyboardEvent = new KeyboardEvent('keydown', {
+  key: '1',
+  code: 'Digit1',
+  keyCode: 49,
+  which: 49
+});
+// 触发事件
+document.dispatchEvent(keyboardEvent);
+
+
+if (videoname !== "") {
+// 创建一个KeyboardEvent对象
+const keyboardEvent = new KeyboardEvent('keydown', {
+  key: '1',
+  code: 'Digit1',
+  keyCode: 49,
+  which: 49
+});
+// 触发事件
+document.dispatchEvent(keyboardEvent);
+}
+
+if (imgname.endsWith(".jpg")) {
+//加载图片
+console.log(imgname)
+image.setAttribute("src", imgname);
+const imgkeyboardEvent = new KeyboardEvent('keydown', {
+  key: '3',
+  code: 'Digit1',
+  keyCode: 49,
+  which: 49
+});
+// 显示图片
+document.dispatchEvent(imgkeyboardEvent);
+}
+
+// setTimeout(() => {
+//   const imgstopkeyboardEvent = new KeyboardEvent('keydown', {
+//   key: '4',
+//   code: 'Digit1',
+//   keyCode: 49,
+//   which: 49
+// });
+// // 触发事件
+// document.dispatchEvent(imgstopkeyboardEvent);
+// }, 3000);
+
+  </script>
+</body>
+</html>

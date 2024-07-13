@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <!--窗口设置,宽度自适应为设备屏幕宽度,初始比例为1.0-->
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <button style="margin-left: 80px;  width: 120px; height: 75px; border-radius: 25px; padding-left: 12px; padding-right: 12px; padding-top: 20px; padding-bottom: 20px; font-size: 30px;" type="submit" class="btn btn-default">发送</button>
+        <video id="video" autoplay="true"  style=" solid 2px; height: 800px; width: 800px;" playsinline="true"></video>
+      </head>
+    <body>
+      <!--添加按钮,用于手动调用js获取数据-->
+      <button type="submit" id="btn_submit" style="display: none;"> 手动从UE4获取数据 </button>
+      <!--导入jquery和echarts-->
+      <script type="text/javascript" src="sockjs-0.3.4.js"></script>
+      <script type="text/javascript" src="jquery-2.1.1.min.js"></script>
+      <script src="js/echarts.min.js"></script>
+      <script>
+
+      var host = window.location.hostname
+      var ws = new WebSocket("ws://127.0.0.1:8802/dighuman");
+      //document.getElementsByTagName("video")[0].setAttribute("src", aa["video"]);
+      ws.onopen = function() {
+      console.log('Connected');
+      };
+      ws.onmessage = function(e) {
+      console.log('Received: ' + e.data);
+      data = e
+      var vid = JSON.parse(data.data);
+      console.log(typeof(vid),vid)
+      document.getElementsByTagName("video")[0].setAttribute("src", vid["video"]);
+
+      };
+      ws.onclose = function(e) {
+      console.log('Closed');
+      };
+
+        /**
+         * 更新数据函数
+         * arg:在本例中,参数类型为字符串,格式为:'value1,value2,value3,....valueX',即数值以逗号隔开
+         */
+        function UpdateDataFromUe4(arg){
+          /**
+           * 1.将传入参数以分割为字符串数组,分隔符为逗号","
+           *  注意:分隔符用什么取决于上面的arg中的数值用什么分隔
+           * 假设arg='100,200,50,60,79,110,20',valueArray=['100','200','50','60','79','110','20']
+           */
+          var valueArray=arg.split(',');
+
+          //2.判断类型是否为数组,如果不是数组类型说明传入的参数格式不对,那么将不进行数据更新操作
+          if(!valueArray instanceof Array)
+          {
+            console.log("传入的数据无法被解析成数组,数据无效");
+            return;
+          }
+          ws.send(valueArray[0]);
+           
+        }
+        //绑定按钮点击事件
+        document.getElementById("btn_submit").addEventListener('click',JsGetDataFromUE4,false);
+        //js调用ue4函数
+        function JsGetDataFromUE4()
+        {
+          alert("调用JSGetDataFromUE4");
+          /**
+           * ue4obj是在UE4中绑定对象时传入的名字,要一致
+           * jsgetdatafromue是蓝图定义的函数,必须使用小写
+           * then(function(ReturnValue))中的ReturnValue作为匿名函数的参数列表,不可以改名,必须叫ReturnValue
+           */
+          ue.ue4obj.jsgetdatafromue().then(function(ReturnValue){
+            alert("从UE4获取数据:"+ReturnValue);
+            /**
+             *js从ue4拿到数据
+             * 因为已经有了现成的更新数据的函数(UpdateDataFromUe4)
+             * 所以将返回值直接传给该函数,更新数据
+             */
+            UpdateDataFromUe4(ReturnValue);
+          });
+        }
+        </script>
+    </body>
+</html>
