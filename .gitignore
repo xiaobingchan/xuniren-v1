@@ -8,3 +8,4 @@ camera/*.mp4
 camera/*.pt
 *.wav
 *.exe
+secrets-real.ini
