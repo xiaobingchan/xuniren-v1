@@ -36,6 +36,8 @@ request.set_domain('nls-meta.cn-shanghai.aliyuncs.com')
 request.set_version('2019-02-28')
 request.set_action_name('CreateToken')
 
+token=""
+
 try : 
    response = client.do_action_with_exception(request)
    jss = json.loads(response)
@@ -116,6 +118,7 @@ def processPOSTRequest(appKey, token, text, audioSaveFile, format, sampleRate) :
 
 
 def speakword(wav_file,text):
+    global token
     start_time = time.perf_counter()  # 记录开始时间
     # 采用RFC 3986规范进行urlencode编码。
     textUrlencode = text
