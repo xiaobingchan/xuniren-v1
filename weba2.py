@@ -489,5 +489,5 @@ if __name__ == '__main__':
     # 开始说话
     total_length=a2fspeakout("初始化完成")
     #app.json.ensure_ascii = False # 解决中文json乱码
-    app.run(port=5001, debug=True,use_reloader=False)
+    app.run(host='0.0.0.0',port=5000, debug=True)
 
