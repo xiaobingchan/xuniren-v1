@@ -36,13 +36,15 @@ request.set_domain('nls-meta.cn-shanghai.aliyuncs.com')
 request.set_version('2019-02-28')
 request.set_action_name('CreateToken')
 
+token=""
+
 try : 
    response = client.do_action_with_exception(request)
    jss = json.loads(response)
    if 'Token' in jss and 'Id' in jss['Token']:
       token = jss['Token']['Id']
       expireTime = jss['Token']['ExpireTime']
-      print("token = " + token)
+      #print("token = " + token)
 except Exception as e:
    print(e)
 
@@ -55,8 +57,8 @@ def processGETRequest(appKey, token, text, audioSaveFile, format, sampleRate) :
     url = url + '&text=' + text
     url = url + '&format=' + format
     url = url + '&sample_rate=' + str(sampleRate)
-    # voice 发音人，可选，默认是xiaoyun。
-    url = url + '&voice=' + 'xiaogang'
+    # voice 发音人，可选，默认是xiaoyun。xiaogang
+    url = url + '&voice=' + 'xiaoyun'
     # volume 音量，范围是0~100，可选，默认50'。
     # url = url + '&volume=' + str(50)
     # speech_rate 语速，范围是-500~500，可选，默认是0。
@@ -71,15 +73,15 @@ def processGETRequest(appKey, token, text, audioSaveFile, format, sampleRate) :
     conn.request(method='GET', url=url)
     # 处理服务端返回的响应。
     response = conn.getresponse()
-    print('Response status and response reason:')
-    print(response.status ,response.reason)
+    #print('Response status and response reason:')
+    #print(response.status ,response.reason)
     contentType = response.getheader('Content-Type')
-    print(contentType)
+    #print(contentType)
     body = response.read()
     if 'audio/mpeg' == contentType :
         with open(audioSaveFile, mode='wb') as f:
             f.write(body)
-        print('The GET request succeed!')
+        #print('The GET request succeed!')
     else :
         print('The GET request failed: ' + str(body))
     conn.close()
@@ -93,7 +95,7 @@ def processPOSTRequest(appKey, token, text, audioSaveFile, format, sampleRate) :
     # 设置HTTPS Body。
     body = {'appkey': appKey, 'token': token, 'text': text, 'format': format, 'sample_rate': sampleRate}
     body = json.dumps(body)
-    print('The POST request body content: ' + body)
+    #print('The POST request body content: ' + body)
     # Python 2.x请使用httplib。
     # conn = httplib.HTTPSConnection(host)
     # Python 3.x请使用http.client。
@@ -101,21 +103,22 @@ def processPOSTRequest(appKey, token, text, audioSaveFile, format, sampleRate) :
     conn.request(method='POST', url=url, body=body, headers=httpHeaders)
     # 处理服务端返回的响应。
     response = conn.getresponse()
-    print('Response status and response reason:')
-    print(response.status ,response.reason)
+    #print('Response status and response reason:')
+    #print(response.status ,response.reason)
     contentType = response.getheader('Content-Type')
-    print(contentType)
+    #print(contentType)
     body = response.read()
     if 'audio/mpeg' == contentType :
         with open(audioSaveFile, mode='wb') as f:
             f.write(body)
-        print('The POST request succeed!')
+        #print('The POST request succeed!')
     else :
         print('The POST request failed: ' + str(body))
     conn.close()
 
 
 def speakword(wav_file,text):
+    global token
     start_time = time.perf_counter()  # 记录开始时间
     # 采用RFC 3986规范进行urlencode编码。
     textUrlencode = text
@@ -134,5 +137,5 @@ def speakword(wav_file,text):
     processGETRequest(appKey, token, textUrlencode, audioSaveFile, format, sampleRate)
     end_time = time.perf_counter()  # 记录结束时间
     elapsed_time = end_time - start_time  # 计算经过的时间
-    print("TTS生成的时间是：{}秒".format(elapsed_time))
+    #print("TTS生成的时间是：{}秒".format(elapsed_time))
     return os.path.abspath(wav_file)
