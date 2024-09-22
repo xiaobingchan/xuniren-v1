@@ -218,8 +218,6 @@ def test():
     data["record_time"]=total_length
     return jsonify(data)
 
-
-
 # 直接说话
 @app.route('/apppost', methods=['POST'])
 def speak():
@@ -409,6 +407,51 @@ def wenxin():
         else:
             data["videoimg"]="UpdateDataFromUe4('"+"stop"+"')"
         return jsonify(data)
+
+# doubao回答
+@app.route('/doubao', methods=['POST'])
+# @timer_limit
+def doubao():
+    global answer_sentence
+    global timers
+    global key
+    data = request.form
+    data_message = data.get("message")
+    # 提示用户输入问题
+    user_question = data_message
+    print("提问豆包大模型")
+    url = 'https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions'
+    headers = {
+        'Authorization': 'Bearer df597f4e-3f9d-4cfe-968f-0bade2f7b79a',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        "model": "bot-20240921105732-frfdn",
+        "stream": False,
+        "stream_options": {"include_usage": True},
+        "messages": [
+            {
+                "role": "user",
+                "content": user_question
+            }
+        ]
+    }
+    response = requests.post(url, headers=headers, json=data)
+    response_data = response.json()
+    content = response_data['choices'][0]['message']['content']
+    print(content)
+    output=content
+    # 开始说话
+    total_length=a2fspeakout(output)
+    timeout = float(total_length) 
+    start_timer(key, timeout)            
+    data = {}
+    data["message"]=output
+    data["record_time"]=total_length
+    return jsonify(data)
+
+
+
 
 # 星火大模型回答
 @app.route('/xinghuo', methods=['POST'])
