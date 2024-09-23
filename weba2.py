@@ -26,6 +26,50 @@ import pypinyin
 from pypinyin import Style
 import datetime
 from fuzzywuzzy import fuzz
+from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
+from sparkai.core.messages import ChatMessage
+import time
+from flask import request
+import queue
+import threading
+
+#星火认知大模型Spark Max的URL值，其他版本大模型URL值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看
+SPARKAI_URL = 'wss://spark-openapi.cn-huabei-1.xf-yun.com/v1/assistants/ofka93cgeoap_v1'
+#星火认知大模型调用秘钥信息，请前往讯飞开放平台控制台（https://console.xfyun.cn/services/bm35）查看
+SPARKAI_APP_ID = '77688bc2'
+SPARKAI_API_SECRET = 'MDJhY2ZjYzdjYWVmYjgxN2JjMjY4MWJk'
+SPARKAI_API_KEY = '5f0c90d03723a56535962a5b7733664f'
+#星火认知大模型Spark Max的domain值，其他版本大模型domain值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看
+SPARKAI_DOMAIN = 'generalv3.5'
+spark = ChatSparkLLM(
+        spark_api_url=SPARKAI_URL,
+        spark_app_id=SPARKAI_APP_ID,
+        spark_api_key=SPARKAI_API_KEY,
+        spark_api_secret=SPARKAI_API_SECRET,
+        spark_llm_domain=SPARKAI_DOMAIN,
+        streaming=True,
+    )
+
+# 创建一个队列
+data_queue = queue.Queue()
+# 处理函数
+def process_queue():
+    while True:
+        # 从队列中获取数据
+        data = data_queue.get()
+        if data is None:  # 用于结束线程
+            break
+        # 处理数据
+        print(f"Processing: {data}")
+        # 开始说话
+        total_length=a2fspeakout(data)
+        time.sleep(total_length)
+        timeout = float(total_length) 
+        start_timer(key, timeout)   
+        data_queue.task_done()
+# 启动后台线程
+thread = threading.Thread(target=process_queue, daemon=True)
+thread.start()
 
 def get_fuzzy_pinyin(text):
     """
@@ -450,6 +494,60 @@ def doubao():
     data["record_time"]=total_length
     return jsonify(data)
 
+
+# 讯飞智能体回答
+@app.route('/xf_zhinengti', methods=['POST'])
+# @timer_limit
+def xf_zhinengti():
+    global answer_sentence
+    global timers
+    global key
+    data = request.form
+    data_message = data.get("message")
+    # 提示用户输入问题
+    user_question = data_message
+    print("提问讯飞智能体")
+    data = request.form
+    data_message = data.get("message")
+    messages = [ChatMessage(
+        role="user",
+        content=data_message
+    )]
+    a = spark.stream(messages)
+    for message in a:
+        message = str(message).replace('\'', '').replace('content=', '').replace('\\n', '').replace('\\', '')
+        if message and 'additional_kwargs=' not in message:
+            data_queue.put(message)
+    
+    # url = 'https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions'
+    # headers = {
+    #     'Authorization': 'Bearer df597f4e-3f9d-4cfe-968f-0bade2f7b79a',
+    #     'Content-Type': 'application/json'
+    # }
+    # data = {
+    #     "model": "bot-20240921105732-frfdn",
+    #     "stream": False,
+    #     "stream_options": {"include_usage": True},
+    #     "messages": [
+    #         {
+    #             "role": "user",
+    #             "content": user_question
+    #         }
+    #     ]
+    # }
+    # response = requests.post(url, headers=headers, json=data)
+    # response_data = response.json()
+    # content = response_data['choices'][0]['message']['content']
+    # print(content)
+    # output=content
+    # # 开始说话
+    # total_length=a2fspeakout(output)
+    # timeout = float(total_length) 
+    # start_timer(key, timeout)            
+    # data = {}
+    # data["message"]=output
+    # data["record_time"]=total_length
+    return jsonify(data)
 
 
 
