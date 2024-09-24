@@ -33,12 +33,15 @@ from flask import request
 import queue
 import threading
 
+config = configparser.ConfigParser()
+config.read('./secrets.ini')
+
 #星火认知大模型Spark Max的URL值，其他版本大模型URL值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看
-SPARKAI_URL = 'wss://spark-openapi.cn-huabei-1.xf-yun.com/v1/assistants/ofka93cgeoap_v1'
+SPARKAI_URL = config.get('xfzhinengti', 'SPARKAI_URL')
 #星火认知大模型调用秘钥信息，请前往讯飞开放平台控制台（https://console.xfyun.cn/services/bm35）查看
-SPARKAI_APP_ID = '77688bc2'
-SPARKAI_API_SECRET = 'MDJhY2ZjYzdjYWVmYjgxN2JjMjY4MWJk'
-SPARKAI_API_KEY = '5f0c90d03723a56535962a5b7733664f'
+SPARKAI_APP_ID = config.get('xfzhinengti', 'SPARKAI_APP_ID')
+SPARKAI_API_SECRET = config.get('xfzhinengti', 'SPARKAI_API_SECRET')
+SPARKAI_API_KEY = config.get('xfzhinengti', 'SPARKAI_API_KEY')
 #星火认知大模型Spark Max的domain值，其他版本大模型domain值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看
 SPARKAI_DOMAIN = 'generalv3.5'
 spark = ChatSparkLLM(
@@ -49,6 +52,9 @@ spark = ChatSparkLLM(
         spark_llm_domain=SPARKAI_DOMAIN,
         streaming=True,
     )
+
+doubao_apikey=config.get('doubao', 'apikey')
+doubao_botname=config.get('doubao', 'botmodel')
 
 # 创建一个队列
 data_queue = queue.Queue()
@@ -98,10 +104,6 @@ def match_fuzzy_pinyin(text, pinyin_str):
     # 判断拼音字符串是否模糊匹配
     return any(re.match(pattern, pinyin_str, re.IGNORECASE) for pattern in patterns)
 
-
-
-config = configparser.ConfigParser()
-config.read('./secrets.ini')
 app = Flask(__name__)
 app.secret_key = 'daowifhsefighsaofhia' # 这里不用改
 wav_name = "test.wav"
@@ -466,11 +468,11 @@ def doubao():
     print("提问豆包大模型")
     url = 'https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions'
     headers = {
-        'Authorization': 'Bearer df597f4e-3f9d-4cfe-968f-0bade2f7b79a',
+        'Authorization': 'Bearer '+doubao_apikey,
         'Content-Type': 'application/json'
     }
     data = {
-        "model": "bot-20240921105732-frfdn",
+        "model": doubao_botname,
         "stream": False,
         "stream_options": {"include_usage": True},
         "messages": [
