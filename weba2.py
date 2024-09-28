@@ -118,7 +118,9 @@ SECRET_KEY = config.get('wenxin', 'appsecret') # 文心一言密钥
 
 timers = {}
 key = uuid.uuid4()
-
+# 全局变量，用于存储句子的长度
+MIN_CHINESE_CHAR_COUNT = 20
+accumulated_message = ""
 
 async def send_message_to_websocket(message):
     async with websockets.connect('ws://localhost:60001') as websocket:
@@ -504,6 +506,7 @@ def xf_zhinengti():
     global answer_sentence
     global timers
     global key
+    global accumulated_message
     data = request.form
     data_message = data.get("message")
     # 提示用户输入问题
@@ -517,10 +520,15 @@ def xf_zhinengti():
     )]
     a = spark.stream(messages)
     for message in a:
-        message = str(message).replace('\'', '').replace('content=', '').replace('\\n', '').replace('\\', '')
-        if message and 'additional_kwargs=' not in message:
-            data_queue.put(message)
-    
+        print(message)
+        # 累积消息
+        if "additional_kwargs" not in str(message) :
+            message=str(message).replace("\\n", "").replace("'", "").replace("content=", "")
+            accumulated_message += str(message) 
+            # 检查累积消息是否多于20个中文字符
+            if len(accumulated_message) >= MIN_CHINESE_CHAR_COUNT:
+                data_queue.put(accumulated_message)
+                accumulated_message = ""  # 清空累积消息
     # url = 'https://ark.cn-beijing.volces.com/api/v3/bots/chat/completions'
     # headers = {
     #     'Authorization': 'Bearer df597f4e-3f9d-4cfe-968f-0bade2f7b79a',
