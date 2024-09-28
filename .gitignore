@@ -9,3 +9,4 @@ camera/*.pt
 *.wav
 *.exe
 secrets-real.ini
+secret-nouse.ini
